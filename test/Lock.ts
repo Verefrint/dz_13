@@ -30,7 +30,12 @@ describe("Game test", async function() {
         if (v[0] === await user1.getAddress()) {
           const proof = tree.getProof(i);
 
-          const mintPrice =100000000000000
+          const mintPrice = 100000000000000
+
+          //should not allow 
+          await expect(contract.connect(user1).mint([], {value: mintPrice})).to.be.revertedWithCustomError(contract, "InvalidProof")
+          //should not allow 
+          await expect(contract.connect(user1).mint(proof, {value: mintPrice - 1})).to.be.revertedWithCustomError(contract, "SmallSumForMint")
 
           await expect(contract.connect(user1).mint(proof, {value: mintPrice})).to.emit(contract, "NFTMinted").withArgs(await user1.getAddress(), 1)
           expect (await contract.balanceOf(await user1.getAddress())).to.equal(1)
